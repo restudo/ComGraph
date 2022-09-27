@@ -50,7 +50,7 @@ void drawScene(void)
 	//kepala
 	glPushMatrix();
 	glTranslatef(X, Y, Z);
-	glRotatef(105, 1, 0, 0);
+	glRotatef(90, 1, 0, 0);
 	glColor3f(0.9, 0.54, 0.036);
 	glutSolidCylinder(8, 1, 40, 2);
 	glPopMatrix();
