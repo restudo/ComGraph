@@ -147,6 +147,7 @@ void drawScene(void)
 	glPushMatrix();
 	glColor3f(1, 0, 0);
 	glTranslatef(0, -1, 0);
+	glScalef(1, 1 + sin( (M_PI/45.0) * angle ), 1);
 	glRotatef(90, 1, 0, 0);
 	glutWireCone(1, 0.5, 60, 1);
 	glPopMatrix();
@@ -156,7 +157,7 @@ void drawScene(void)
 	glTranslatef(1, 0.2, 0);
 	glRotatef(20, 0, 0, 1);
 	glColor3f(0, 0, 0);
-	glScalef(2.5, 1, 1);
+	glScalef(2.5, 1 + sin( (M_PI/45.0) * angle ), 1);
 	glutWireSphere(0.3, 30, 2);
 	glPopMatrix();
 	
@@ -165,7 +166,7 @@ void drawScene(void)
 	glTranslatef(-1, 0.2, 0);
 	glRotatef(20, 0, 0, -1);
 	glColor3f(0, 0, 0);
-	glScalef(2.5, 1, 1);
+	glScalef(2.5, 1 + sin( (M_PI/45.0) * angle ), 1);
 	glutWireSphere(0.3, 30, 2);
 	glPopMatrix();
 
