@@ -1,3 +1,10 @@
+/*  Kelompok 4
+    Wahyu Putra Ramadhan / 5221600007
+    Restu Dwi Octavriandi / 5221600013
+    GameTech A 2021
+    WORKSHOP GRAFIKA KOMPUTER
+*/
+
 #include <math.h>
 #include <time.h>
 #include <GL/glew.h>
@@ -167,7 +174,7 @@ void display_clock()
     // Put view state on screen / print
     glColor3f(0.0, 0.0, 0.0);
     Print(0.0, -7.0, asctime(newtime));
-    Draw_clock(0.0, 2.0, -15.0);
+    Draw_clock(0.0, 2.0, -1.0);
     glutSwapBuffers();
 }
 
