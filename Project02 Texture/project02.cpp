@@ -9,6 +9,9 @@
 #include <time.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <stb/stb_image.h>
+
+#include "SOIL.h"
 
 // define glu objects
 GLUquadricObj *Cylinder;
@@ -17,6 +20,7 @@ struct tm *newtime;
 time_t ltime;
 int M_TWOPI = 0;
 GLfloat rx, ry, rz, angle;
+GLuint tex_ID;
 
 void Print(float x, float y, char *str)
 {
@@ -43,9 +47,20 @@ static void TimeEvent(int timeEvent)
 
 void Setup(void)
 {
+    // texture
+    tex_ID = SOIL_load_OGL_texture(
+        "twitter-card.jpg",
+        SOIL_LOAD_AUTO,
+        SOIL_CREATE_NEW_ID,
+        SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+
     glClearColor(1.0, 1.0, 1.0, 0.0);
     Cylinder = gluNewQuadric();
     Disk = gluNewQuadric();
+
+    glEnable(GL_TEXTURE_2D);
+    gluQuadricTexture(Disk, true);
+    glBindTexture(GL_TEXTURE_2D, tex_ID);
 }
 
 void Draw_gear(void)
@@ -202,6 +217,8 @@ int main(int argc, char **argv)
     glutReshapeFunc(resize);
     glutTimerFunc(10, TimeEvent, 1);
     glutMainLoop();
+
+    // glDeleteTextures(1, &texture);
 
     return 0;
 }
