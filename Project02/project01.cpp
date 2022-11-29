@@ -22,12 +22,13 @@ struct tm *newtime;
 time_t ltime;
 int M_TWOPI = 0;
 GLfloat rx, ry, rz, angle;
+bool isLightEnable = false;
 
 void Print(float x, float y, char *str)
 {
     int l, i;
     l = strlen(str);
-    glRasterPos3f(x, y, -15);
+    glRasterPos3f(x, y, -5);
     for (i = 0; i < l; i++)
     {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, str[i]);
@@ -57,6 +58,15 @@ void loadTextureFromFile(const char *filename, unsigned int texture)
 const char *filename1 = "twitter-card.jpg";
 unsigned int tob[0];
 
+void textureSetup()
+{
+    glEnable(GL_TEXTURE_2D);
+
+    glGenTextures(1, &tob[0]);
+
+    loadTextureFromFile(filename1, tob[0]);
+}
+
 static void TimeEvent(int timeEvent)
 {
     rx = 30 * cos(angle);
@@ -74,6 +84,7 @@ void Setup(void)
     glClearColor(1.0, 1.0, 1.0, 0.0);
     Cylinder = gluNewQuadric();
     Disk = gluNewQuadric();
+    textureSetup();
 }
 
 void Draw_gear(void)
@@ -92,9 +103,8 @@ void Draw_clock(GLfloat x, GLfloat y, GLfloat z)
     // Draw clock face
     glPushMatrix();
 
-    glEnable(GL_TEXTURE_2D);
-    gluQuadricTexture(Disk, GL_TRUE);
-    glBindTexture(GL_TEXTURE_2D, tob[0]);
+    gluQuadricTexture(Disk, GL_TRUE);     ///
+    glBindTexture(GL_TEXTURE_2D, tob[0]); ///
 
     glColor3f(0.0, 0.2, 0.4);
     glTranslatef(0, 0, 1.0);
@@ -132,6 +142,9 @@ void Draw_clock(GLfloat x, GLfloat y, GLfloat z)
     glScalef(0.37, 0.37, 1.0);
     Draw_gear();
     glPopMatrix();
+
+    gluQuadricTexture(Cylinder, GL_TRUE); ///
+    glBindTexture(GL_TEXTURE_2D, tob[0]); ///
 
     glRotatef(90, 1.0, 0.0, 0.0);
     gluCylinder(Cylinder, 0.37, 0, 5, 16, 16);
@@ -204,6 +217,40 @@ void display_clock()
     newtime = localtime(&ltime); // Convert to local time
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
+    if (isLightEnable)
+    {
+        glEnable(GL_COLOR_MATERIAL);
+        glEnable(GL_LIGHTING);  // Enable lighting
+        glEnable(GL_LIGHT0);    // Enable light #0
+        glEnable(GL_LIGHT1);    // Enable light #1
+        glEnable(GL_NORMALIZE); // Automatically normalize normals
+    }
+    else if (!isLightEnable)
+    {
+        glDisable(GL_COLOR_MATERIAL);
+        glDisable(GL_LIGHTING);  // Enable lighting
+        glDisable(GL_LIGHT0);    // Enable light #0
+        glDisable(GL_LIGHT1);    // Enable light #1
+        glDisable(GL_NORMALIZE); // Automatically normalize normals
+    }
+
+    glShadeModel(GL_SMOOTH); // Enable smooth shading
+
+    glEnable(GL_TEXTURE_2D);
+
+    // Add ambient light
+    GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f}; // Color (0.2, 0.2, 0.2)
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
+
+    // Add positioned light
+    GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f}; // Color (0.5, 0.5, 0.5)
+    GLfloat lightPos0[] = {0.0f, 0.0f, -5.0f, 1.0f};  // Positioned at (0, 0, -5)
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
+
     // Put view state on screen / print
     glColor3f(0.0, 0.0, 0.0);
     Print(0.0, -7.0, asctime(newtime));
@@ -222,6 +269,25 @@ void resize(int w, int h)
     glLoadIdentity();
 }
 
+void keyInput(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
+    case 27:
+        exit(0);
+        break;
+    case 'q':
+        if (isLightEnable)
+            isLightEnable = false;
+        else if (!isLightEnable)
+            isLightEnable = true;
+        glutPostRedisplay();
+        break;
+    default:
+        break;
+    }
+}
+
 int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
@@ -230,12 +296,10 @@ int main(int argc, char **argv)
     glutInitWindowPosition(50, 50);
     glutCreateWindow(argv[0]);
     glutSetWindowTitle("Project02 ComGraph");
-    glGenTextures(1, &tob[0]);
-    loadTextureFromFile(filename1, tob[0]);
     Setup();
-
     glutDisplayFunc(display_clock);
     glutReshapeFunc(resize);
+    glutKeyboardFunc(keyInput);
     glutTimerFunc(10, TimeEvent, 1);
     glutMainLoop();
 
